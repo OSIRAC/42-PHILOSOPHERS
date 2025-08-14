@@ -47,6 +47,8 @@ void	init_philos(t_philo *philos, t_data *data)
 		philos[i].data = data;
 		philos[i].last_eat = data->start_time;
 		philos[i].eat_count = 0;
+		philos[i].has_left_fork = 0;
+		philos[i].has_right_fork = 0;
 		i++;
 	}
 }
@@ -64,14 +66,35 @@ void	smart_sleep(size_t duration, t_philo *philo)
 	size_t	start;
 
 	start = current_time();
-	while (!philo->data->someone_died && (current_time() - start < duration))
+	while (current_time() - start < duration)
+	{
+		if (is_someone_died(philo->data))
+			break ;
 		usleep(500);
+	}
+}
+
+int	is_someone_died(t_data *data)
+{
+	int	died;
+
+	pthread_mutex_lock(&data->death_lock);
+	died = data->someone_died;
+	pthread_mutex_unlock(&data->death_lock);
+	return (died);
+}
+
+void	set_someone_died(t_data *data)
+{
+	pthread_mutex_lock(&data->death_lock);
+	data->someone_died = 1;
+	pthread_mutex_unlock(&data->death_lock);
 }
 
 void	print_action(t_philo *philo, char *message)
 {
 	pthread_mutex_lock(&philo->data->write_lock);
-	if (!philo->data->someone_died)
+	if (!is_someone_died(philo->data))
 		printf("%zu %d %s\n", current_time()
 			- philo->data->start_time, philo->id, message);
 	pthread_mutex_unlock(&philo->data->write_lock);

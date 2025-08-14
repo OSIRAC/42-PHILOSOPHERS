@@ -29,24 +29,48 @@ void	take_forks(t_philo *philo)
 	int	id;
 	int	left;
 	int	right;
+	int	first;
+	int	second;
 
 	id = philo->id;
 	left = id - 1;
 	right = id % philo->data->number_of_philo;
-	pthread_mutex_lock(&philo->data->forks[right]);
-	if (philo->data->someone_died)
+	philo->has_left_fork = 0;
+	philo->has_right_fork = 0;
+	if (left < right)
 	{
-		pthread_mutex_unlock(&philo->data->forks[right]);
+		first = left;
+		second = right;
+	}
+	else
+	{
+		first = right;
+		second = left;
+	}
+	pthread_mutex_lock(&philo->data->forks[first]);
+	if (is_someone_died(philo->data))
+	{
+		pthread_mutex_unlock(&philo->data->forks[first]);
 		return ;
 	}
+	if (first == left)
+		philo->has_left_fork = 1;
+	else
+		philo->has_right_fork = 1;
 	print_action(philo, "has taken a fork");
-	pthread_mutex_lock(&philo->data->forks[left]);
-	if (philo->data->someone_died)
+	pthread_mutex_lock(&philo->data->forks[second]);
+	if (is_someone_died(philo->data))
 	{
-		pthread_mutex_unlock(&philo->data->forks[left]);
-		pthread_mutex_unlock(&philo->data->forks[right]);
+		pthread_mutex_unlock(&philo->data->forks[second]);
+		pthread_mutex_unlock(&philo->data->forks[first]);
+		philo->has_left_fork = 0;
+		philo->has_right_fork = 0;
 		return ;
 	}
+	if (second == left)
+		philo->has_left_fork = 1;
+	else
+		philo->has_right_fork = 1;
 	print_action(philo, "has taken a fork");
 }
 
@@ -59,6 +83,14 @@ void	put_down_forks(t_philo *philo)
 	id = philo->id;
 	left = id - 1;
 	right = (id % philo->data->number_of_philo);
-	pthread_mutex_unlock(&philo->data->forks[left]);
-	pthread_mutex_unlock(&philo->data->forks[right]);
+	if (philo->has_right_fork)
+	{
+		pthread_mutex_unlock(&philo->data->forks[right]);
+		philo->has_right_fork = 0;
+	}
+	if (philo->has_left_fork)
+	{
+		pthread_mutex_unlock(&philo->data->forks[left]);
+		philo->has_left_fork = 0;
+	}
 }

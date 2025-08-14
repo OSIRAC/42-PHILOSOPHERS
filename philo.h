@@ -41,6 +41,8 @@ typedef struct s_philo
 	int			eat_count;
 	pthread_t	thread;
 	t_data		*data;
+	int			has_left_fork;
+	int			has_right_fork;
 }	t_philo;
 
 size_t	current_time(void);
@@ -63,5 +65,7 @@ void	think(t_philo *philo);
 void	eat(t_philo *philo);
 void	manage_threads(t_philo *philos, t_data *data);
 void	take_forks(t_philo *philo);
+int		is_someone_died(t_data *data);
+void	set_someone_died(t_data *data);
 
 #endif

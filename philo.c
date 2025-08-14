@@ -22,17 +22,19 @@ void	*philosopher(void *arg)
 			smart_sleep(philo->data->time_to_die + 1, philo), NULL);
 	if (philo->id % 2 == 0)
 		smart_sleep(1, philo);
-	while (!philo->data->someone_died)
+	while (1)
 	{
+		if (is_someone_died(philo->data))
+			break ;
 		print_action(philo, "is thinking");
-		if (philo->data->someone_died)
+		if (is_someone_died(philo->data))
 			break ;
 		take_forks(philo);
-		if (philo->data->someone_died)
+		if (is_someone_died(philo->data))
 			return (put_down_forks(philo), NULL);
 		eat(philo);
 		put_down_forks(philo);
-		if (philo->data->someone_died)
+		if (is_someone_died(philo->data))
 			break ;
 		print_action(philo, "is sleeping");
 		smart_sleep(philo->data->time_to_sleep, philo);
@@ -47,13 +49,13 @@ void	*observer_fn(void *arg)
 
 	philos = (t_philo *)arg;
 	data = philos[0].data;
-	while (!data->someone_died)
+	while (1)
 	{
+		if (is_someone_died(data))
+			break ;
 		if (data->must_eat > 0 && not_enough_eat(philos))
 		{
-			pthread_mutex_lock(&data->death_lock);
-			data->someone_died = 1;
-			pthread_mutex_unlock(&data->death_lock);
+			set_someone_died(data);
 			return (NULL);
 		}
 		if (check_death(philos) == 1)
