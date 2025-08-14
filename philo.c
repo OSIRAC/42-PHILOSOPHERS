@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oislamog <oislamog@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ancengiz <ancengiz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 15:57:51 by oislamog          #+#    #+#             */
-/*   Updated: 2025/05/27 16:53:39 by oislamog         ###   ########.fr       */
+/*   Updated: 2025/08/14 19:55:31 by ancengiz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	*philosopher(void *arg)
 		return (print_action(philo, "has taken a fork"),
 			smart_sleep(philo->data->time_to_die + 1, philo), NULL);
 	if (philo->id % 2 == 0)
-		usleep(1000);
+		smart_sleep(1, philo);
 	while (!philo->data->someone_died)
 	{
 		print_action(philo, "is thinking");
