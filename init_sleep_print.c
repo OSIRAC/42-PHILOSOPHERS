@@ -6,7 +6,7 @@
 /*   By: oislamog <oislamog@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 15:57:19 by oislamog          #+#    #+#             */
-/*   Updated: 2025/05/27 17:42:40 by oislamog         ###   ########.fr       */
+/*   Updated: 2025/08/16 15:49:19 by oislamog         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,38 +64,35 @@ size_t	current_time(void)
 void	smart_sleep(size_t duration, t_philo *philo)
 {
 	size_t	start;
+	int		should_continue ;
 
 	start = current_time();
-	while (current_time() - start < duration)
+	pthread_mutex_lock(&philo->data->death_lock);
+	should_continue = !philo->data->someone_died;
+	pthread_mutex_unlock(&philo->data->death_lock);
+	while (should_continue && (current_time() - start < duration))
 	{
-		if (is_someone_died(philo->data))
-			break ;
 		usleep(500);
+		pthread_mutex_lock(&philo->data->death_lock);
+		should_continue = !philo->data->someone_died;
+		pthread_mutex_unlock(&philo->data->death_lock);
 	}
-}
-
-int	is_someone_died(t_data *data)
-{
-	int	died;
-
-	pthread_mutex_lock(&data->death_lock);
-	died = data->someone_died;
-	pthread_mutex_unlock(&data->death_lock);
-	return (died);
-}
-
-void	set_someone_died(t_data *data)
-{
-	pthread_mutex_lock(&data->death_lock);
-	data->someone_died = 1;
-	pthread_mutex_unlock(&data->death_lock);
 }
 
 void	print_action(t_philo *philo, char *message)
 {
-	pthread_mutex_lock(&philo->data->write_lock);
-	if (!is_someone_died(philo->data))
-		printf("%zu %d %s\n", current_time()
-			- philo->data->start_time, philo->id, message);
-	pthread_mutex_unlock(&philo->data->write_lock);
+	pthread_mutex_lock(&philo->data->death_lock);
+	if (!philo->data->someone_died)
+	{
+		pthread_mutex_unlock(&philo->data->death_lock);
+		pthread_mutex_lock(&philo->data->write_lock);
+		pthread_mutex_lock(&philo->data->death_lock);
+		if (!philo->data->someone_died)
+			printf("%zu %d %s\n", current_time() - philo->data->start_time,
+				philo->id, message);
+		pthread_mutex_unlock(&philo->data->death_lock);
+		pthread_mutex_unlock(&philo->data->write_lock);
+	}
+	else
+		pthread_mutex_unlock(&philo->data->death_lock);
 }

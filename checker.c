@@ -6,7 +6,7 @@
 /*   By: oislamog <oislamog@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 15:57:12 by oislamog          #+#    #+#             */
-/*   Updated: 2025/05/27 16:13:30 by oislamog         ###   ########.fr       */
+/*   Updated: 2025/08/16 14:48:04 by oislamog         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int	checker(char **str, int nbr)
 			j++;
 		while (str[i][j] == '0')
 			j++;
-		if (ft_strlen (&str[i][j]) > 10)
+		if (ft_strlen(&str[i][j]) > 10)
 			return (1);
 		while (str[i][j])
 		{
@@ -74,16 +74,16 @@ int	not_enough_eat(t_philo *philo)
 {
 	int	i;
 	int	philo_count;
-	int	eat_count;
+	int	count;
 
 	i = 0;
 	philo_count = philo->data->number_of_philo;
 	while (i < philo_count)
 	{
 		pthread_mutex_lock(&philo->data->death_lock);
-		eat_count = philo[i].eat_count;
+		count = philo[i].eat_count;
 		pthread_mutex_unlock(&philo->data->death_lock);
-		if (eat_count < philo->data->must_eat)
+		if (count < philo->data->must_eat)
 			return (0);
 		i++;
 	}

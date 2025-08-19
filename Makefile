@@ -1,8 +1,7 @@
-
 NAME        = philo
-CC          = clang
+CC          = cc
 CFLAGS      = -Wall -Wextra -Werror -pthread -fsanitize=thread
-SRCS        = philo.c checker.c init_sleep_print.c philo_util.c
+SRCS        = philo.c checker.c init_sleep_print.c philo_util.c philo_util2.c
 OBJS        = $(SRCS:.c=.o)
 HEADER      = philo.h
 

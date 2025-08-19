@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ancengiz <ancengiz@student.42.fr>          +#+  +:+       +#+        */
+/*   By: oislamog <oislamog@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 15:57:51 by oislamog          #+#    #+#             */
-/*   Updated: 2025/08/14 19:55:31 by ancengiz         ###   ########.fr       */
+/*   Updated: 2025/08/16 15:54:10 by oislamog         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,46 +21,29 @@ void	*philosopher(void *arg)
 		return (print_action(philo, "has taken a fork"),
 			smart_sleep(philo->data->time_to_die + 1, philo), NULL);
 	if (philo->id % 2 == 0)
-		smart_sleep(1, philo);
-	while (1)
-	{
-		if (is_someone_died(philo->data))
-			break ;
-		print_action(philo, "is thinking");
-		if (is_someone_died(philo->data))
-			break ;
-		take_forks(philo);
-		if (is_someone_died(philo->data))
-			return (put_down_forks(philo), NULL);
-		eat(philo);
-		put_down_forks(philo);
-		if (is_someone_died(philo->data))
-			break ;
-		print_action(philo, "is sleeping");
-		smart_sleep(philo->data->time_to_sleep, philo);
-	}
-	return (NULL);
+		smart_sleep(philo->data->time_to_eat, philo);
+	return (philosopher_loop(philo));
 }
 
 void	*observer_fn(void *arg)
 {
-	t_philo		*philos;
-	t_data		*data;
+	t_philo	*philos;
+	t_data	*data;
 
 	philos = (t_philo *)arg;
 	data = philos[0].data;
-	while (1)
+	while (!data->someone_died)
 	{
-		if (is_someone_died(data))
-			break ;
 		if (data->must_eat > 0 && not_enough_eat(philos))
 		{
-			set_someone_died(data);
+			pthread_mutex_lock(&data->death_lock);
+			data->someone_died = 1;
+			pthread_mutex_unlock(&data->death_lock);
 			return (NULL);
 		}
 		if (check_death(philos) == 1)
 			return (NULL);
-		usleep(1000);
+		usleep(500);
 	}
 	return (NULL);
 }

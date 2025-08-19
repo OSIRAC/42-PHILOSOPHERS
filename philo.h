@@ -6,18 +6,18 @@
 /*   By: oislamog <oislamog@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 15:58:14 by oislamog          #+#    #+#             */
-/*   Updated: 2025/05/27 15:58:18 by oislamog         ###   ########.fr       */
+/*   Updated: 2025/08/16 16:14:26 by oislamog         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
 
+# include <pthread.h>
 # include <stdio.h>
 # include <stdlib.h>
-# include <unistd.h>
-# include <pthread.h>
 # include <sys/time.h>
+# include <unistd.h>
 
 typedef struct s_data
 {
@@ -32,40 +32,37 @@ typedef struct s_data
 	size_t			start_time;
 	int				someone_died;
 	int				must_eat;
-}	t_data;
+}					t_data;
 
 typedef struct s_philo
 {
-	int			id;
-	size_t		last_eat;
-	int			eat_count;
-	pthread_t	thread;
-	t_data		*data;
-	int			has_left_fork;
-	int			has_right_fork;
-}	t_philo;
+	int				id;
+	size_t			last_eat;
+	int				eat_count;
+	pthread_t		thread;
+	t_data			*data;
+	int				has_left_fork;
+	int				has_right_fork;
+}					t_philo;
 
-size_t	current_time(void);
-void	print_action(t_philo *philo, char *message);
-void	init_data(t_data *data, char **argv);
-void	init_philos(t_philo *philos, t_data *data);
-void	*philosopher(void *arg);
-void	*observer_fn(void *arg);
-int		checker(char **str, int nbr);
-int		ft_strlen(char *str);
-long	ft_atol(char *str);
-int		not_enough_eat(t_philo *philo);
-int		check_death(t_philo *philo);
-void	smart_sleep(size_t duration, t_philo *philo);
-void	put_down_forks(t_philo *philo);
-void	destroy_mutex(t_data *data);
-void	philo_take(t_philo *philo);
-void	philo_take2(t_philo *philo);
-void	think(t_philo *philo);
-void	eat(t_philo *philo);
-void	manage_threads(t_philo *philos, t_data *data);
-void	take_forks(t_philo *philo);
-int		is_someone_died(t_data *data);
-void	set_someone_died(t_data *data);
-
+size_t				current_time(void);
+void				print_action(t_philo *philo, char *message);
+void				init_data(t_data *data, char **argv);
+void				init_philos(t_philo *philos, t_data *data);
+void				*philosopher(void *arg);
+void				*observer_fn(void *arg);
+int					checker(char **str, int nbr);
+int					ft_strlen(char *str);
+long				ft_atol(char *str);
+int					not_enough_eat(t_philo *philo);
+int					check_death(t_philo *philo);
+void				smart_sleep(size_t duration, t_philo *philo);
+void				put_down_forks(t_philo *philo);
+void				destroy_mutex(t_data *data);
+void				philo_take_right_first(t_philo *philo);
+void				philo_take_left_first(t_philo *philo);
+void				eat(t_philo *philo);
+void				manage_threads(t_philo *philos, t_data *data);
+void				take_forks(t_philo *philo);
+void				*philosopher_loop(t_philo *philo);
 #endif
